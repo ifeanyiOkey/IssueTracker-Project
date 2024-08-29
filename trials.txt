@@ -1,0 +1,177 @@
+"use strict";
+
+const mongoose = require("mongoose");
+const issueModel = require('../models').Issue;
+const projectModel = require('../models').Project;
+
+module.exports = function (app) {
+
+  app
+    .route("/api/issues/:project")
+    .get(function (req, res) {
+      // get all issues in a project
+      let projectName = req.params.project;
+
+      // const {
+      //   issue_title,
+      //   issue_text,
+      //   created_by,
+      //   assigned_to,
+      //   status_text,
+      //   created_on,
+      //   updated_on,
+      //   open,
+      //   _id
+      // } = req.query;
+      let query = req.query;
+      // query.projectName = projectName;
+      console.log(query);
+      // query the database to get the created project
+      projectModel.find({ name: projectName })
+        .then(data => {
+          // return empty array if project name does not exist
+          if (!data.length) {
+            res.json(data);
+          } else {
+            // get all issues of the project
+            let projectIssues = data[0].issues;
+            // res.json(projectIssues);
+            // console.log(Object.keys(query));
+            const queryKeys = Object.keys(query);
+            const queryValues = Object.values(query);
+            let filteredData = projectIssues;
+            
+            for (let i = 0; i < queryKeys.length; i++) {
+            filteredData = filteredData.filter(
+            (row) => row[queryKeys[i]] === queryValues[i]
+            );
+            }
+            res.json(filteredData);
+           
+            
+            
+            // const result = projectIssues.filter(item => {
+            //   let filtered = {};
+            //   if (issue_title) {
+            //     return item.issue_title === issue_title
+            //   }
+            //   if (issue_text) return item.issue_text === issue_text
+            //   return item
+            //   // if (item.issue_title === issue_title) {
+            //   //   return item
+            //   // } else if (item.issue_text === issue_text) {
+            //   //   return item
+            //   // } else if (item.created_by === created_by) {
+            //   //   return item
+            //   // } else if (item.assigned_to === assigned_to) {
+            //   //   return item
+            //   // } else if (item.status_text === status_text) {
+            //   //   return item
+            //   // } else if (item.created_on === created_on) {
+            //   //   return item
+            //   // } else if (item.updated_on === updated_on) {
+            //   //   return item
+            //   // } else if (item.open === Boolean(open)) {
+            //   //   return item
+            //   // } else if (item.id === _id) {
+            //   //   return item
+            //   // } 
+              
+            // })
+            // res.json(result);
+            
+            
+          }
+
+          // let answer = result.map(x => {
+          //   return {
+          //     _id: x.id,
+          //     issue_title: x.issue_title,
+          //     issue_text: x.issue_text,
+          //     created_by: x.created_by,
+          //     assigned_to: x.assigned_to,
+          //     status_text: x.status_text,
+          //     created_on: x.created_on,
+          //     updated_on: x.updated_on,
+          //     open: x.open
+          //   }
+          // });
+          
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+
+    .post(function (req, res) {
+      let projectName = req.params.project;
+      // declear all req.body variables at once
+      const {
+        issue_title,
+        issue_text,
+        created_by,
+        assigned_to,
+        status_text,
+      } = req.body;
+      // validate entries for issue_title, issue_text, created_by
+      if (!issue_title || !issue_text || !created_by) {
+        return res.json({
+          error: 'required field(s) missing'
+        });
+      };
+
+      const newIssue = new issueModel({
+        issue_title: issue_title,
+        issue_text: issue_text,
+        created_by: created_by,
+        assigned_to: assigned_to,
+        status_text: status_text,
+        created_on: new Date().toISOString(),
+        updated_on: new Date().toISOString(),
+        open: true,
+      });
+      projectModel.findOne({ name: projectName })
+        .then((project) => {
+          if (!project) {
+            // create new project
+            const newProject = new projectModel({ name: projectName });
+            newProject.issues.push(newIssue);
+            newProject
+              .save()
+              .then(() => res.json(newIssue))
+              .catch((err) => console.log(err));
+          } else {
+            projectModel.findOneAndUpdate(project, {$push: {issues: newIssue }})
+            .then(() => res.json(newIssue))
+            .catch(err => console.log(err));
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    //   newIssue
+    //     .save()
+    //     .then((data) => {
+    //       console.log(data._id);
+    //       res.json({
+    //         _id: data._id,
+    //         issue_title: data.issue_title,
+    //         issue_text: data.issue_text,
+    //         created_on: data.created_on,
+    //         updated_on: data.updated_on,
+    //         created_by: data.created_by,
+    //         assigned_to: data.assigned_to,
+    //         status_text: data.status_text,
+    //       });
+    //     })
+    //     .catch((err) => console.log(err));
+    })
+
+    .put(function (req, res) {
+      let project = req.params.project;
+    })
+
+    .delete(function (req, res) {
+      let project = req.params.project;
+    });
+};
