@@ -22,7 +22,6 @@ module.exports = function (app) {
         _id
       } = req.query;
 
-
       // filter query issues
       projectModel.aggregate([
         { $match: { name: projectName } },
@@ -44,19 +43,21 @@ module.exports = function (app) {
         ? { $match: { 'issues.status_text': status_text } }
         : { $match: {} },
         created_on != undefined
-        ? { $match: { 'issues.created_on': created_on } }
+        ? { $match: { 'issues.created_on': new Date(created_on) } }
         : { $match: {} },
         updated_on != undefined
-        ? { $match: { 'issues.updated_on': updated_on } }
+        ? { $match: { 'issues.updated_on': new Date(updated_on) } }
         : { $match: {} },
         open != undefined
-        ? { $match: { 'issues.open': open } }
+        //convert open to boolean and fileter
+        ? { $match: { 'issues.open': open == 'true' } }
         : { $match: {} },
         _id != undefined
         ? { $match: { 'issues.id': _id } }
         : { $match: {} },
       ])
       .then(data => {
+        console.log(open);
         if(!data) {
           res.json([]);
         } else {
@@ -113,8 +114,8 @@ module.exports = function (app) {
         created_by: created_by,
         assigned_to: assigned_to,
         status_text: status_text,
-        created_on: new Date().toISOString(),
-        updated_on: new Date().toISOString(),
+        created_on: new Date(),
+        updated_on: new Date(),
         open: true,
       });
       projectModel.findOne({ name: projectName })
