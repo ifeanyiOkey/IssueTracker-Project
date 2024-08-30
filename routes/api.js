@@ -166,15 +166,15 @@ module.exports = function (app) {
               res.json({ error: 'could not update', '_id': _id })
             } else {
               // get issue record by id using id function
-              const issueRec = projectData.issues.id(_id);
+              const issueDoc = projectData.issues.id(_id);
               // set update values
-              issueRec.issue_title = issue_title || issueRec.issue_title;
-              issueRec.issue_text = issue_text || issueRec.issue_text;
-              issueRec.created_by = created_by || issueRec.created_by
-              issueRec.assigned_to = assigned_to || issueRec.assigned_to;
-              issueRec.status_text = status_text || issueRec.status_text;
-              issueRec.open = open || issueRec.open;
-              issueRec.updated_on = new Date().toISOString();
+              issueDoc.issue_title = issue_title || issueDoc.issue_title;
+              issueDoc.issue_text = issue_text || issueDoc.issue_text;
+              issueDoc.created_by = created_by || issueDoc.created_by
+              issueDoc.assigned_to = assigned_to || issueDoc.assigned_to;
+              issueDoc.status_text = status_text || issueDoc.status_text;
+              issueDoc.open = open || issueDoc.open;
+              issueDoc.updated_on = new Date().toISOString();
               projectData
                 .save()
                 .then(() => {
@@ -194,7 +194,7 @@ module.exports = function (app) {
         res.json({ error: 'no update field(s) sent', '_id': _id });
       }
         // .then(projectData => {
-        //   // get issue record by id using id function
+        //   // get issue doc by id using id function
         //   
         //   console.log()
         //   console.log(issueRec);
@@ -208,5 +208,30 @@ module.exports = function (app) {
 
     .delete(function (req, res) {
       let project = req.params.project;
+      const { _id } = req.body;
+      if (!_id) res.json({ error: 'missing _id' })
+      projectModel.findOne({ name: project})
+        .then(data => {
+          if (!data) {
+            res.json({ error: 'could not delete', '_id': _id });
+          } else {
+            const issueDoc = data.issues.id(_id);
+            if (!issueDoc) res.json({ error: 'could not delete', '_id': _id });
+            issueDoc.deleteOne();
+            data
+              .save()
+              .then(() => {
+                res.json({ result: 'successfully deleted', '_id': _id })
+              })
+              .catch(err => {
+                res.json({ error: 'could not delete', '_id': _id });
+                console.log(err);
+              })
+          }
+        })
+        .catch(err => {
+          res.json({ error: 'could not delete', '_id': _id });
+          console.log(err);
+        })
     });
 };
