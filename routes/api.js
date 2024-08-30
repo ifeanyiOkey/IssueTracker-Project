@@ -22,8 +22,6 @@ module.exports = function (app) {
         _id
       } = req.query;
 
-      console.log(_id);
-
       // filter query issues
       projectModel.aggregate([
         { $match: { name: projectName } },
@@ -152,9 +150,9 @@ module.exports = function (app) {
         status_text,
         open
       } = req.body;
+      if (!_id) res.json({ error: 'missing _id' })
 
       if (
-        _id ||
         issue_title ||
         issue_text ||
         created_by ||
@@ -188,12 +186,13 @@ module.exports = function (app) {
                 })
             }
           })
-          .catch(err => console.log(err));
+          .catch(err => {
+            res.json({ error: 'could not update', '_id': _id });
+            console.log(err);
+          });
       } else {
-        res.json({ error: 'no update field(s) sent', '_id': _id })
-        console.log('nothing sent')
+        res.json({ error: 'no update field(s) sent', '_id': _id });
       }
-      if (!_id) res.json({ error: 'missing _id' })
         // .then(projectData => {
         //   // get issue record by id using id function
         //   
