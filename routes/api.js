@@ -1,5 +1,5 @@
 "use strict";
-
+const mongoose = require("mongoose");
 const issueModel = require('../models').Issue;
 const projectModel = require('../models').Project;
 
@@ -21,6 +21,8 @@ module.exports = function (app) {
         open,
         _id
       } = req.query;
+
+      console.log(_id);
 
       // filter query issues
       projectModel.aggregate([
@@ -54,11 +56,11 @@ module.exports = function (app) {
         ? { $match: { 'issues.open': open === 'true' } }
         : { $match: {} },
         _id != undefined
-        ? { $match: { 'issues.id': _id } }
+        ? { $match: { 'issues._id': new mongoose.Types.ObjectId(`${_id}`) } }
         : { $match: {} },
       ])
       .then(data => {
-        console.log(open);
+        console.log(data);
         if(!data) {
           res.json([]);
         } else {
