@@ -60,7 +60,6 @@ module.exports = function (app) {
         : { $match: {} },
       ])
       .then(data => {
-        console.log(data);
         if(!data) {
           res.json([]);
         } else {
@@ -153,9 +152,9 @@ module.exports = function (app) {
         status_text,
         open
       } = req.body;
-      if (!_id) res.json({ error: 'missing _id' })
 
       if (
+        _id ||
         issue_title ||
         issue_text ||
         created_by ||
@@ -194,6 +193,7 @@ module.exports = function (app) {
         res.json({ error: 'no update field(s) sent', '_id': _id })
         console.log('nothing sent')
       }
+      if (!_id) res.json({ error: 'missing _id' })
         // .then(projectData => {
         //   // get issue record by id using id function
         //   
