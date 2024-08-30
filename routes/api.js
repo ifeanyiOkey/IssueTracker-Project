@@ -48,9 +48,10 @@ module.exports = function (app) {
         updated_on != undefined
         ? { $match: { 'issues.updated_on': new Date(updated_on) } }
         : { $match: {} },
-        open != undefined
-        //convert open to boolean and fileter
-        ? { $match: { 'issues.open': open == 'true' } }
+        open === 'true'
+        ? { $match: { 'issues.open': open === 'true' } }
+        : open === 'false'
+        ? { $match: { 'issues.open': open === 'true' } }
         : { $match: {} },
         _id != undefined
         ? { $match: { 'issues.id': _id } }
