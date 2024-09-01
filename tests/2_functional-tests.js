@@ -213,10 +213,10 @@ suite('Functional Tests', function () {
       .request(server)
       .keepOpen()
       .del('/api/issues/apitest')
-      .send({ _id: '66c9d0f353cfa16603e2876e' })
+      .send({ _id: '66ca0183e33cbcda611a2b73' })
       .end((err, res) => {
         expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"result":"successfully deleted","_id":"66c9d0f353cfa16603e2876e"}');
+        expect(res.text).to.equal('{"result":"successfully deleted","_id":"66ca0183e33cbcda611a2b73"}');
         done();
       });
   });
