@@ -93,7 +93,6 @@ module.exports = function (app) {
 
     .post(function (req, res) {
       let projectName = req.params.project;
-      // declear all req.body variables at once
       const {
         issue_title,
         issue_text,
@@ -189,17 +188,6 @@ module.exports = function (app) {
       } else {
         res.json({ error: 'no update field(s) sent', '_id': _id });
       }
-        // .then(projectData => {
-        //   // get issue doc by id using id function
-        //   
-        //   console.log()
-        //   console.log(issueRec);
-        //   if (!projectData.issues) {
-        //     res.json({ error: 'could not update', '_id': _id });
-        //   }
-          
-        // })
-        // .catch(err => console.log(err))
     })
 
     .delete(function (req, res) {
