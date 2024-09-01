@@ -139,7 +139,10 @@ suite('Functional Tests', function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        expect(res.text).to.include('successfully updated');
+        assert.equal(
+          res.text,
+          '{"result":"successfully updated","_id":"'+testDeleteId+'"}'
+        );
         expect(res.body._id).to.equal(testDeleteId);
         done();
       });
@@ -157,7 +160,10 @@ suite('Functional Tests', function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        expect(res.text).to.include('successfully updated');
+        assert.equal(
+          res.text,
+          '{"result":"successfully updated","_id":"'+testDeleteId+'"}'
+        );
         expect(res.body._id).to.equal(testDeleteId);
         done();
       });
@@ -185,7 +191,7 @@ suite('Functional Tests', function () {
       .send({ _id: testDeleteId })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        expect(res.text).to.include('no update field(s) sent');
+        expect(res.text).to.equal('{"error":"no update field(s) sent","_id":"'+testDeleteId+'"}');
         done();
       });
   });
@@ -214,7 +220,7 @@ suite('Functional Tests', function () {
       .send({ _id: testDeleteId })
       .end((err, res) => {
         expect(res).to.have.status(200);
-        expect(res.text).to.include('successfully deleted');
+        expect(res.text).to.equal('{"result":"successfully deleted","_id":"'+testDeleteId+'"}');
         done();
       });
   });
