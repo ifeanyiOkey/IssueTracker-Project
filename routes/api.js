@@ -103,9 +103,7 @@ module.exports = function (app) {
       } = req.body;
       // validate entries for issue_title, issue_text, created_by
       if (!issue_title || !issue_text || !created_by) {
-        return res.json({
-          error: 'required field(s) missing'
-        });
+        return res.json({ error: 'required field(s) missing' });
       };
 
       const newIssue = new issueModel({
@@ -182,13 +180,12 @@ module.exports = function (app) {
                 })
                 .catch(err => {
                   res.json({ error: 'could not update', '_id': _id });
-                  console.log(err);
                 })
             }
           })
           .catch(err => {
             res.json({ error: 'could not update', '_id': _id });
-            console.log(err);
+            console.log('Error: Invalid ID, '+err);
           });
       } else {
         res.json({ error: 'no update field(s) sent', '_id': _id });
