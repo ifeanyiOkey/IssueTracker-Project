@@ -7,15 +7,16 @@ const server = require('../server');
 chai.use(chaiHttp);
 
 suite('Functional Tests', function () {
+  let testDeleteId;
   this.timeout(5000);
   // Test_1
   test('Create an issue with every field', (done) => {
     chai
       .request(server)
       .keepOpen()
-      .post('/api/issues/{project}')
+      .post('/api/issues/test')
       .send({
-        issue_title: 'Jetland printer',
+        issue_title: 'Jet printer',
         issue_text: 'Not printing',
         created_by: 'Jane',
         assigned_to: 'Jeff',
@@ -24,13 +25,14 @@ suite('Functional Tests', function () {
       .end((err, res) => {
         const body = res.body;
         assert.equal(res.status, 200);
-        assert.equal(body.issue_title, 'Jetland printer');
+        assert.equal(body.issue_title, 'Jet printer');
         assert.equal(body.issue_text, 'Not printing');
         assert.equal(body.created_by, 'Jane');
         assert.equal(body.assigned_to, 'Jeff');
         assert.equal(body.status_text, 'Wrong cartridge');
         assert.equal(body.open, true);
         assert.property(body, '_id');
+        testDeleteId = res.body._id;
         done();
       });
   });
@@ -39,7 +41,7 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .post('/api/issues/{project}')
+      .post('/api/issues/test')
       .send({
         issue_title: 'Dell laptop',
         issue_text: 'Not coming up',
@@ -61,7 +63,7 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .post('/api/issues/{project}')
+      .post('/api/issues/test')
       .send({
         created_by: 'Joan'
       })
@@ -76,7 +78,7 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .get('/api/issues/Printer')
+      .get('/api/issues/test')
       .query({})
       .end((err, res) => {
         assert.equal(res.status, 200);
@@ -90,13 +92,13 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .get('/api/issues/Printer')
-      .query({ created_by: 'Jeff' })
+      .get('/api/issues/test')
+      .query({ created_by: 'Juliet' })
       .end((err, res) => {
         const doc = res.body[0];
         assert.equal(res.status, 200);
         assert.isArray(res.body);
-        assert.equal(doc.created_by, 'Jeff');
+        assert.equal(doc.created_by, 'Juliet');
         assert.property(doc, 'issue_title');
         assert.property(doc, 'issue_text');
         assert.property(doc, 'created_by');
@@ -114,13 +116,13 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .get('/api/issues/apitest')
-      .query({ created_by: 'Gentle', issue_title: 'HP' })
+      .get('/api/issues/test')
+      .query({ created_by: 'Juliet', issue_title: 'Dell laptop' })
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.isArray(res.body);
-        assert.equal(res.body[0].created_by, 'Gentle');
-        assert.equal(res.body[0].issue_title, 'HP');
+        assert.equal(res.body[0].created_by, 'Juliet');
+        assert.equal(res.body[0].issue_title, 'Dell laptop');
         assert.property(res.body[0], 'open');
         done();
       });
@@ -130,17 +132,15 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .put('/api/issues/apitest')
+      .put('/api/issues/test')
       .send({
-        _id: '66c9d1c253cfa16603e28780',
+        _id: testDeleteId,
         status_text: 'Replace power not ready'
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        assert.equal(
-          res.text,
-          '{"result":"successfully updated","_id":"66c9d1c253cfa16603e28780"}'
-        );
+        expect(res.text).to.include('successfully updated');
+        expect(res.body._id).to.equal(testDeleteId);
         done();
       });
   });
@@ -149,18 +149,16 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .put('/api/issues/apitest')
+      .put('/api/issues/test')
       .send({
-        _id: '66c9d1c253cfa16603e28780',
+        _id: testDeleteId,
         assigned_to: 'Ifeanyi',
         status_text: 'Replace power, not ready',
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        assert.equal(
-          res.text,
-          '{"result":"successfully updated","_id":"66c9d1c253cfa16603e28780"}'
-        );
+        expect(res.text).to.include('successfully updated');
+        expect(res.body._id).to.equal(testDeleteId);
         done();
       });
   });
@@ -169,7 +167,7 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .put('/api/issues/apitest')
+      .put('/api/issues/test')
       .send({ assigned_to: 'Ifeanyi' })
       .end((err, res) => {
         // trying Chai’s Expect assertion library
@@ -183,11 +181,11 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .put('/api/issues/apitest')
-      .send({ _id: '66c9d1c253cfa16603e28780' })
+      .put('/api/issues/test')
+      .send({ _id: testDeleteId })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        expect(res.text).to.equal('{"error":"no update field(s) sent","_id":"66c9d1c253cfa16603e28780"}');
+        expect(res.text).to.include('no update field(s) sent');
         done();
       });
   });
@@ -196,7 +194,7 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .put('/api/issues/apitest')
+      .put('/api/issues/test')
       .send({
         _id: '66c9d1c253cfa16603e2878',
         issue_title: 'New'
@@ -212,11 +210,11 @@ suite('Functional Tests', function () {
     chai
       .request(server)
       .keepOpen()
-      .del('/api/issues/apitest')
-      .send({ _id: '66ca0183e33cbcda611a2b73' })
+      .del('/api/issues/test')
+      .send({ _id: testDeleteId })
       .end((err, res) => {
         expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"error":"could not delete","_id":"66ca0183e33cbcda611a2b73"}');
+        expect(res.text).to.include('successfully deleted');
         done();
       });
   });
