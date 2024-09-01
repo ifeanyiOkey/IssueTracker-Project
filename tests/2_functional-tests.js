@@ -176,9 +176,8 @@ suite('Functional Tests', function () {
       .put('/api/issues/test')
       .send({ assigned_to: 'Ifeanyi' })
       .end((err, res) => {
-        // trying Chai’s Expect assertion library
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"error":"missing _id"}');
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"missing _id"}');
         done();
       });
   });
@@ -191,7 +190,7 @@ suite('Functional Tests', function () {
       .send({ _id: testDeleteId })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        expect(res.text).to.equal('{"error":"no update field(s) sent","_id":"'+testDeleteId+'"}');
+        assert.equal(res.text, '{"error":"no update field(s) sent","_id":"'+testDeleteId+'"}');
         done();
       });
   });
@@ -206,8 +205,8 @@ suite('Functional Tests', function () {
         issue_title: 'New'
       })
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"error":"could not update","_id":"66c9d1c253cfa16603e2878"}');
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"could not update","_id":"66c9d1c253cfa16603e2878"}');
         done();
       });
   });
@@ -219,8 +218,8 @@ suite('Functional Tests', function () {
       .del('/api/issues/test')
       .send({ _id: testDeleteId })
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"result":"successfully deleted","_id":"'+testDeleteId+'"}');
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"result":"successfully deleted","_id":"'+testDeleteId+'"}');
         done();
       });
   });
@@ -232,8 +231,8 @@ suite('Functional Tests', function () {
       .del('/api/issues/apitest')
       .send({_id: '66c9d0f353ca16603e2876e'})
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"error":"could not delete","_id":"66c9d0f353ca16603e2876e"}');
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"could not delete","_id":"66c9d0f353ca16603e2876e"}');
         done();
       });
   });
@@ -245,8 +244,8 @@ suite('Functional Tests', function () {
       .del('/api/issues/apitest')
       .send({})
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('{"error":"missing _id"}');
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"missing _id"}');
         done();
       });
   });
