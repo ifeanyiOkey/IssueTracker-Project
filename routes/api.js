@@ -185,7 +185,6 @@ module.exports = function (app) {
           })
           .catch(err => {
             res.json({ error: 'could not update', '_id': _id });
-            console.log('Error: Invalid ID, '+err);
           });
       } else {
         res.json({ error: 'no update field(s) sent', '_id': _id });
@@ -222,13 +221,11 @@ module.exports = function (app) {
               })
               .catch(err => {
                 res.json({ error: 'could not delete', '_id': _id });
-                console.log(err);
               })
           }
         })
         .catch(err => {
           res.json({ error: 'could not delete', '_id': _id });
-          console.log(err);
         })
     });
 };
