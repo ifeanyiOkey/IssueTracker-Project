@@ -212,7 +212,9 @@ module.exports = function (app) {
             res.json({ error: 'could not delete', '_id': _id });
           } else {
             const issueDoc = data.issues.id(_id);
-            if (!issueDoc) res.json({ error: 'could not delete', '_id': _id });
+            if (!issueDoc) {
+              res.json({ error: 'could not delete', '_id': _id });
+            }
             issueDoc.deleteOne();
             data
               .save()
